@@ -33,7 +33,11 @@ EOTEXT
     foreach ($roots as $lib => $root) {
       echo phutil_console_format(
         "%s\n",
-        pht('Upgrading %s...', $lib));
+        pht('UPDATED! Upgrading %s...', $lib));
+
+      echo phutil_console_format(
+        "%s\n",
+        pht('From root %s...', $root));
 
       $working_copy = ArcanistWorkingCopyIdentity::newFromPath($root);
       $configuration_manager = clone $this->getConfigurationManager();
@@ -76,7 +80,7 @@ EOTEXT
       }
 
       $branch_name = $repository->getBranchName();
-      if ($branch_name != 'master' && $branch_name != 'stable') {
+      if ($branch_name != 'master' && $branch_name != 'stable' && $branch_name != 'verbose_upgrade') {
         throw new ArcanistUsageException(
           pht(
             "%s must be on either branch '%s' or '%s' to be automatically ".
@@ -91,6 +95,10 @@ EOTEXT
       }
 
       chdir($root);
+
+      echo phutil_console_format(
+        "%s\n",
+        pht('Running `git pull --rebase`'));
 
       try {
         execx('git pull --rebase');
