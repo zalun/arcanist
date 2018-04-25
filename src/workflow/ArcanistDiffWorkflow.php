@@ -2325,7 +2325,7 @@ EOTEXT
       'sourceControlSystem'       => $vcs,
       'sourceControlPath'         => $base_path,
       'sourceControlBaseRevision' => $base_revision,
-      'creationMethod'            => 'arc',
+      'creationMethod'            => 'mozarc',
     );
 
     if (!$this->isRawDiffSource()) {

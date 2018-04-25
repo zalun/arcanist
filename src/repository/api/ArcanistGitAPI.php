@@ -597,17 +597,58 @@ final class ArcanistGitAPI extends ArcanistRepositoryAPI {
     return $stdout;
   }
 
+  public function cinnabarHg2Git($hash) {
+    try {
+      list($stdout) = execx('git cinnabar hg2git %s', $hash);
+    } catch (CommandException $e) {
+      return 0;
+    }
+    $git_hash = rtrim($stdout);
+    /* Check if a public commit */
+    if ($git_hash && $git_hash != '0000000000000000000000000000000000000000') {
+      return $git_hash;
+    }
+    return 0;
+  }
+
+  public function cinnabarGit2Hg($hash) {
+    try {
+      list($stdout) = execx('git cinnabar git2hg %s', $hash);
+    } catch (CommandException $e) {
+      return 0;
+    }
+    $hg_hash = rtrim($stdout);
+    if ($hg_hash && $hg_hash != '0000000000000000000000000000000000000000') {
+      return $hg_hash;
+    }
+    return 0;
+  }
+
   public function getSourceControlBaseRevision() {
     list($stdout) = $this->execxLocal(
       'rev-parse %s',
       $this->getBaseCommit());
-    return rtrim($stdout, "\n");
+    $stdout = rtrim($stdout, "\n");
+
+    $hg_hash = $this->cinnabarGit2Hg($stdout);
+    if ($hg_hash) {
+      echo phutil_console_format(
+        "%s\n",
+        pht('Using git cinnabar to get the base commit.'));
+      $stdout = $hg_hash;
+    }
+
+    return $stdout;
   }
 
   public function getCanonicalRevisionName($string) {
     $match = null;
+    $git_hash = $this->cinnabarHg2Git($string);
     if (preg_match('/@([0-9]+)$/', $string, $match)) {
       $stdout = $this->getHashFromFromSVNRevisionNumber($match[1]);
+    } else if ($git_hash) {
+      echo phutil_console_format("%s\n", pht('Using git cinnabar.'));
+      $stdout = $git_hash;
     } else {
       list($stdout) = $this->execxLocal(
         phutil_is_windows()
