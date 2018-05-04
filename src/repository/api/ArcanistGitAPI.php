@@ -48,6 +48,11 @@ final class ArcanistGitAPI extends ArcanistRepositoryAPI {
 
 
   public function getSourceControlSystemName() {
+    list($stdout) = $this->execxLocal(
+      'rev-parse --revs-only refs/cinnabar/metadata');
+    if ($stdout) {
+      return 'hg';
+    }
     return 'git';
   }
 
