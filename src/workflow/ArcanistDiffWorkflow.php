@@ -2624,7 +2624,10 @@ EOTEXT
       "D{$id}",
       $title);
 
-    $ok = phutil_console_confirm($prompt, $default_no = true);
+    $ok = (
+      $this->mozPhabConfirm($prompt)
+      || phutil_console_confirm($prompt, $default_no = true)
+    );
     if (!$ok) {
       throw new ArcanistUsageException(
         pht('Aborted update of revision: You are not the owner.'));
