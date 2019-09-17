@@ -48,12 +48,18 @@ final class ArcanistGitAPI extends ArcanistRepositoryAPI {
 
 
   public function getSourceControlSystemName() {
-    list($stdout) = $this->execxLocal(
-      'rev-parse --revs-only refs/cinnabar/metadata');
-    if ($stdout) {
+    // When using cinnabar identify as hg to Phabricator to match the remote
+    // repository type.
+    if ($this->isCinnabar()) {
       return 'hg';
     }
     return 'git';
+  }
+
+  public function isCinnabar() {
+    list($stdout) = $this->execxLocal(
+      'rev-parse --revs-only refs/cinnabar/metadata');
+    return (bool)($stdout);
   }
 
   public function getGitVersion() {

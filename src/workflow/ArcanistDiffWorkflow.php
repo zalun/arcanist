@@ -2415,6 +2415,14 @@ EOTEXT
       }
     }
 
+    if (method_exists($repository_api, 'isCinnabar') &&
+        $repository_api->isCinnabar()) {
+      $creation_method = 'cinnabarc-git-cinnabar';
+    } else {
+      $vcs_name = $repository_api->getSourceControlSystemName();
+      $creation_method = 'cinnabarc-'.$vcs_name;
+    }
+
     $data = array(
       'sourceMachine'             => php_uname('n'),
       'sourcePath'                => $source_path,
@@ -2423,7 +2431,7 @@ EOTEXT
       'sourceControlSystem'       => $vcs,
       'sourceControlPath'         => $base_path,
       'sourceControlBaseRevision' => $base_revision,
-      'creationMethod'            => 'cinnabarc',
+      'creationMethod'            => $creation_method,
     );
 
     if (!$this->isRawDiffSource()) {
