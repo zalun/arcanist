@@ -212,6 +212,11 @@ final class ArcanistGitAPI extends ArcanistRepositoryAPI {
         'message' => $message,
         'authorEmail' => $author_email,
       );
+
+      // Set the `rev` value - bug 1587240
+      if ($this->isCinnabar()) {
+        $commits[$commit]['rev'] = $commit;
+      }
     }
 
     return $commits;
